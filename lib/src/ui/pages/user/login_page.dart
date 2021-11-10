@@ -43,6 +43,8 @@ class _LoginPageState extends State<LoginPage> {
         });
         final prefs = await SharedPreferences.getInstance();
         prefs.setString('token', jsonResponse);
+        prefs.setString('user', UserName.toString());
+        
         Navigator.push(context, MaterialPageRoute(builder: (context) =>  ScreenMain())
       );
       }else{

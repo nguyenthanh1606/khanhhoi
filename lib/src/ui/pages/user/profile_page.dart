@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sea_demo01/src/model/infouser_model.dart';
+import 'package:sea_demo01/src/repositories/InfoUserByUserName.dart';
 import 'package:sea_demo01/src/ui/compoment/compoment.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
+
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -16,41 +15,20 @@ class ProfilePage extends StatefulWidget {
 }
 
 
-late Future<InfoUser> _InfoUserByUserName;
-
-Future<InfoUser> getInfoUserByUserName() async {
-  final prefs = await SharedPreferences.getInstance();
-  final data = prefs.getString('token');
-  var url = Uri.parse(
-      'https://i-sea.khanhhoi.net/api/user/getInfobyUsername/anhtuanrs');
-  String ApiKey = data.toString().replaceAll('"', "");
-  Map<String, String> requestHeaders = {
-    'ClientIP': '192.168.2.54',
-    'ApiKey': ApiKey,
-  };
-  final response = await http.get(url, headers: requestHeaders);
-  if (response.statusCode == 200) {
-    return InfoUser.fromJson(convert.jsonDecode(response.body));
-  } else {
-    throw Exception('Failed to load info user');
-  }
-}
-
-
-
 class _ProfilePageState extends State<ProfilePage> {
+  final _infoUserByUserName = new  InfoUserByUserName();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(
+        title: const Center(
           child: Text(
             "Profile Page",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
         elevation: 0.5,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -64,14 +42,14 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: SingleChildScrollView(
         child: Stack(
-          children: [
+          children: <Widget>[
             Container(
               height: 100,
-              child: HeaderCompoment(100, false, Icons.house_rounded),
+              child: const HeaderCompoment(100, false, Icons.house_rounded),
             ),
             Container(
-                child: FutureBuilder<InfoUser>(
-              future: getInfoUserByUserName(),
+              child: FutureBuilder<InfoUser>(
+              future: _infoUserByUserName.getInfoUserByUserName(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Container(

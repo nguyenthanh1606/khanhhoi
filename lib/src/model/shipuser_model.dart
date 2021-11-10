@@ -2,36 +2,36 @@ class AllShipByUserId {
   late String imei;
   late String imeiExt;
   late String dateExpDevice;
-  late var dateCreateDV;
+  var dateCreateDV;
   late int idShip;
   late String tentau;
-  late var cohieu;
+  var cohieu;
   late String hohieu;
   late String imo;
   late int noidangky;
   late int cangdangky;
   late int cangcaphu;
   late int nghechinh;
-  late var ngaydangky;
-  late var ngayhethandangky;
-  late var tongtaitrong;
-  late double chieudailonnhat;
-  late double chieuronglonnhat;
-  late double monnuoc;
+  var ngaydangky;
+  var ngayhethandangky;
+  var tongtaitrong;
+  var chieudailonnhat;
+  var chieuronglonnhat;
+  var monnuoc;
   late int congsuat;
-  late var mauvotau;
+  var mauvotau;
   late int sothuyenvien;
-  late var ngaysanxuat;
-  late var ngayhethan;
+  var ngaysanxuat;
+  var ngayhethan;
   late int loaitau;
-  late var dungtichhamca;
+  var dungtichhamca;
   late int vantocdanhbat;
   late int vantochanhtrinh;
   late int deviceid;
   late String dateCreate;
   late bool isActive;
   late String madinhdanh;
-  late var idBoss;
+  var idBoss;
   late bool isTruth;
   late double latitude;
   late double longitude;
@@ -188,5 +188,13 @@ class AllShipByUserId {
     data['time_send_TCTS'] = this.timeSendTCTS;
     data['registered'] = this.registered;
     return data;
+  }
+
+  set setName(String name) {
+    tentau = name;
+  }
+
+  String get getName {
+    return tentau;
   }
 }

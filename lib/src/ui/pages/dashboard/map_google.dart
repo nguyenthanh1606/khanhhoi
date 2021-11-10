@@ -1,13 +1,11 @@
 import 'dart:async';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:sea_demo01/src/model/shipuser_model.dart';
+import 'package:sea_demo01/src/repositories/AllShip.dart';
 import 'package:sea_demo01/src/repositories/pin_pill_info.dart';
 import 'package:sea_demo01/src/ui/compoment/map_pin_pill.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 class MapGoogle extends StatefulWidget {
   const MapGoogle({Key? key}) : super(key: key);
@@ -27,8 +25,7 @@ class _MapGoogleState extends State<MapGoogle> {
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
   List<LatLng> polylineCoordinates = [];
-  List<AllShipByUserId> allShipByUserId = [];
-  late String ApiKey;
+  final _allShip = new AllShip();
   PolylinePoints polylinePoints = PolylinePoints();
   String googleAPIKey = 'AIzaSyDO5GoIsghz2hD3oi3CuhDxNgKuN3Gz7KE';
   late BitmapDescriptor sourceIcon;
@@ -48,25 +45,10 @@ class _MapGoogleState extends State<MapGoogle> {
   late PinInformation _sourcePinInfo;
   late PinInformation destinationPinInfo;
 
-  Future<void> getAllShipByUserId() async {
-    var url = Uri.parse('https://i-sea.khanhhoi.net/api/Ship/getAllship/23');
-    final prefs = await SharedPreferences.getInstance();
-    final data = prefs.getString('token');
-    ApiKey = data.toString().replaceAll('"',"");
-    Map<String, String> requestHeaders = {
-       'ClientIP': '192.168.2.54',
-       'ApiKey': ApiKey,
-     };
-    var response = await http.get(url,headers:requestHeaders);
-    var jsonData = convert.jsonDecode(response.body);
-    List<dynamic> body = convert.jsonDecode(response.body);
-    allShipByUserId = body.map((dynamic item) => AllShipByUserId.fromJson(item)).toList();
-  }
-
   @override
   void initState() {
     super.initState();
-    getAllShipByUserId();
+    _allShip.getAllShipByUserId();
     setSourceAndDestinationIcons();
   }
 
@@ -74,8 +56,8 @@ class _MapGoogleState extends State<MapGoogle> {
     String _status = "";
     _markers.add(Marker(
         // This marker id can be anything that uniquely identifies each marker.
-        markerId: MarkerId(allShipByUserId[0].imei),
-        position: LatLng(allShipByUserId[0].latitude,allShipByUserId[0].longitude),
+        markerId: MarkerId( _allShip.allShipByUserId[0].imei),
+        position: LatLng(_allShip.allShipByUserId[0].latitude,_allShip.allShipByUserId[0].longitude),
         onTap: () {
           setState(() {
             currentlySelectedPin = sourcePinInfo;
@@ -84,27 +66,27 @@ class _MapGoogleState extends State<MapGoogle> {
         },
         icon: sourceIcon));
 
-    if(allShipByUserId[0].isActive == true){
+    if(_allShip.allShipByUserId[0].isActive == true){
       _status = "Hoạt động";
     }else{
       _status = "Mất tín hiệu";
     }
 
     sourcePinInfo = PinInformation(
-      vehicalNumber: allShipByUserId[0].tentau,
-      location: LatLng(allShipByUserId[0].latitude,allShipByUserId[0].longitude),
+      vehicalNumber: _allShip.allShipByUserId[0].tentau,
+      location: LatLng(_allShip.allShipByUserId[0].latitude,_allShip.allShipByUserId[0].longitude),
       pinPath: "assets/icons/driving_pin.png",
       avatarPath: "assets/images/friend1.jpg",
       labelColor: Colors.blueAccent,
       address: 'Phường 12, Thành phố Vũng Tầu, Bà Rịa - Vũng Tàu, Việt Nam',
       status: _status,
-      timeSave: allShipByUserId[0].dateSave,
+      timeSave: _allShip.allShipByUserId[0].dateSave,
     );
     
     _markers.add(Marker(
         // This marker id can be anything that uniquely identifies each marker.
-        markerId: MarkerId(allShipByUserId[1].imei),
-        position: LatLng(allShipByUserId[1].latitude,allShipByUserId[1].longitude),
+        markerId: MarkerId(_allShip.allShipByUserId[1].imei),
+        position: LatLng(_allShip.allShipByUserId[1].latitude,_allShip.allShipByUserId[1].longitude),
         onTap: () {
           setState(() {
             currentlySelectedPin = _sourcePinInfo;
@@ -113,21 +95,21 @@ class _MapGoogleState extends State<MapGoogle> {
         },
         icon: sourceIcon));
 
-    if(allShipByUserId[1].isActive == true){
+    if(_allShip.allShipByUserId[1].isActive == true){
       _status = "Hoạt động";
     }else{
       _status = "Mất tín hiệu";
     }
 
     _sourcePinInfo = PinInformation(
-      vehicalNumber: allShipByUserId[1].tentau,
-      location: LatLng(allShipByUserId[1].latitude,allShipByUserId[1].longitude),
+      vehicalNumber: _allShip.allShipByUserId[1].tentau,
+      location: LatLng(_allShip.allShipByUserId[1].latitude,_allShip.allShipByUserId[1].longitude),
       pinPath: "assets/icons/driving_pin.png",
       avatarPath: "assets/images/friend1.jpg",
       labelColor: Colors.blueAccent,
       address: 'Bình Châu, Xuyên Mộc, Bà Rịa - Vũng Tàu, Việt Nam',
       status: _status,
-      timeSave: allShipByUserId[1].dateSave,
+      timeSave: _allShip.allShipByUserId[1].dateSave,
     );
 
     // destination pin

@@ -41,7 +41,7 @@ class InfoUser {
       this.resetToken,
       this.resetTokenExpires,
       this.verificationToken});
-
+  
   factory InfoUser.fromJson(Map<String, dynamic> json) {
     return InfoUser(
       id : json['id'],
