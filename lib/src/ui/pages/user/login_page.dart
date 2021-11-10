@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sea_demo01/generated/l10n.dart';
 import 'package:sea_demo01/src/ui/compoment/compoment.dart';
 import 'package:sea_demo01/src/ui/screen.dart';
@@ -48,22 +49,15 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.push(context, MaterialPageRoute(builder: (context) =>  ScreenMain())
       );
       }else{
-        showDialog(context: context,
-         builder: (context) => AlertDialog(
-          title: Text("Cảnh báo đăng nhập"),
-          content: Text("Sai tài khoản hoặc mật khẩu vui lòng kiểm tra lại"),
-          actions: [
-            FlatButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                      "Yes",
-                      style: TextStyle(
-                          color: Colors.blueAccent,
-                          fontSize: 16,
-                          fontFamily: "Arial"),
-                    ),)
-          ],
-        ));
+        Fluttertoast.showToast(
+            msg: "Tài khoản hoặc mật khẩu không đúng. Vui lòng nhập lại!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Color.fromRGBO(70, 70, 70, 1.0),
+            textColor: Colors.white,
+            fontSize: 12.0
+        );
       }
     }
   }

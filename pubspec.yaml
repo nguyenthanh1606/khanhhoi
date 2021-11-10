@@ -50,6 +50,7 @@ dependencies:
   flutter_polyline_points: ^1.0.0
   dart_ipify: ^1.1.1
   shared_preferences: ^2.0.8
+  fluttertoast: ^8.0.8
 
 dev_dependencies:
   flutter_test:
