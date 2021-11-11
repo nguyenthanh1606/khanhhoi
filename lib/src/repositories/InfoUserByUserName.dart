@@ -9,15 +9,14 @@ class InfoUserByUserName{
     late InfoUser _InfoUser;
     Future<InfoUser> getInfoUserByUserName() async {
       final prefs = await SharedPreferences.getInstance();
-      final data = prefs.getString('token');
-      final _data = prefs.getString('user');
+      final ApiKey = prefs.getString('token');
+      final username = prefs.getString('user');
       var url = Uri.parse(
-          'https://i-sea.khanhhoi.net/api/user/getInfobyUsername/'+_data.toString());
-      String ApiKey = data.toString().replaceAll('"', "");
+          'https://i-sea.khanhhoi.net/api/user/getInfobyUsername/'+username.toString());
       final String ip = await Ipify.ipv4().toString();
       Map<String, String> requestHeaders = {
         'ClientIP': ip,
-        'ApiKey': ApiKey,
+        'ApiKey': ApiKey.toString(),
       };
       final response = await http.get(url, headers: requestHeaders);
       if (response.statusCode == 200) {

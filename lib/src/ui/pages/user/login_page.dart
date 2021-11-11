@@ -39,8 +39,7 @@ class _LoginPageState extends State<LoginPage> {
     };
     Map body = {"UserName_": UserName, "pass_": PassWord, "type_": Type};
     var jsonResponse;
-    var res =
-        await http.post(url, headers: requestHeaders, body: json.encode(body));
+    var res = await http.post(url, headers: requestHeaders, body: json.encode(body));
     if (bloc.isValidInfo(_userControler.text, _passControler.text)) {
       if (res.statusCode == 200) {
         jsonResponse = json.decode(res.body);
@@ -49,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
             _isLoading = false;
           });
           final prefs = await SharedPreferences.getInstance();
-          prefs.setString('token', jsonResponse);
+          prefs.setString('token', jsonResponse.toString());
           prefs.setString('user', UserName.toString());
           await _infoUserByUserName.getInfoUserByUserName();
           Navigator.push(

@@ -12,15 +12,14 @@ class AllShip{
   List<AllShipByUserId> allShipByUserId = [];
   Future<void> getAllShipByUserId() async {
     final prefs = await SharedPreferences.getInstance();
-    var data = prefs.getString('token');
-    var data_ = prefs.getString('_id');
-    String ApiKey = data.toString().replaceAll('"',"");
-    String _id = data_.toString();
+    var ApiKey = prefs.getString('token');
+    var id = prefs.getString('_id');
+    String _id = id.toString();
     var url = Uri.parse('https://i-sea.khanhhoi.net/api/Ship/getAllship/'+_id);
     final String ip = await Ipify.ipv4().toString();
     Map<String, String> requestHeaders = {
        'ClientIP': ip,
-       'ApiKey': ApiKey,
+       'ApiKey': ApiKey.toString(),
      };
     var response = await http.get(url,headers:requestHeaders);
     
