@@ -48,12 +48,12 @@ class _MapGoogleState extends State<MapGoogle> {
   @override
   void initState() {
     super.initState();
-    _allShip.getAllShipByUserId();
     setSourceAndDestinationIcons();
   }
 
-  void setMapPins() {
+  void setMapPins() async{
     String _status = "";
+    await _allShip.getAllShipByUserId();
     _markers.add(Marker(
         // This marker id can be anything that uniquely identifies each marker.
         markerId: MarkerId( _allShip.allShipByUserId[0].imei),
@@ -147,9 +147,10 @@ class _MapGoogleState extends State<MapGoogle> {
         'assets/icons/destination_map_marker.png');
   }
 
-  void onMapCreated(GoogleMapController controller) {
+  void onMapCreated(GoogleMapController controller){
     //controller.setMapStyle(Utils.mapStyles);
     _controller.complete(controller);
+    
     setMapPins();
     setPolylines();
   }

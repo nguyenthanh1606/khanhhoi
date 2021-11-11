@@ -4,6 +4,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sea_demo01/generated/l10n.dart';
+import 'package:sea_demo01/src/repositories/InfoUserByUserName.dart';
+import 'package:sea_demo01/src/repositories/login_bloc.dart';
 import 'package:sea_demo01/src/ui/compoment/compoment.dart';
 import 'package:sea_demo01/src/ui/screen.dart';
 import 'package:sea_demo01/src/ui/themes/index.dart';
@@ -22,42 +24,46 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   double _headerHeight = 250;
   Key _formKey = GlobalKey<FormState>();
-  bool _isLoading = false; 
+  bool _isLoading = false;
+  InfoUserByUserName _infoUserByUserName = new InfoUserByUserName();
   TextEditingController _userControler = new TextEditingController();
   TextEditingController _passControler = new TextEditingController();
+  LoginBloc bloc = new LoginBloc();
 
-  signIn(String UserName,String PassWord, int Type) async{
+  signIn(String UserName, String PassWord, int Type) async {
     var url = Uri.parse('https://i-sea.khanhhoi.net/home/login');
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    final String internal = await Ipify.ipv4().toString();
+    final String ip = await Ipify.ipv4().toString();
     Map<String, String> requestHeaders = {
-       'ClientIP': '192.168.2.54',
-     };
+      'ClientIP': ip,
+    };
     Map body = {"UserName_": UserName, "pass_": PassWord, "type_": Type};
     var jsonResponse;
-    var res = await http.post(url,headers:requestHeaders,body:json.encode(body));
-    if(res.statusCode ==200){
-      jsonResponse = json.decode(res.body);
-      if(jsonResponse != null){
-        setState(() {
-          _isLoading = false;
-        });
-        final prefs = await SharedPreferences.getInstance();
-        prefs.setString('token', jsonResponse);
-        prefs.setString('user', UserName.toString());
-        
-        Navigator.push(context, MaterialPageRoute(builder: (context) =>  ScreenMain())
-      );
-      }else{
-        Fluttertoast.showToast(
-            msg: "Tài khoản hoặc mật khẩu không đúng. Vui lòng nhập lại!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Color.fromRGBO(70, 70, 70, 1.0),
-            textColor: Colors.white,
-            fontSize: 12.0
-        );
+    var res =
+        await http.post(url, headers: requestHeaders, body: json.encode(body));
+    if (bloc.isValidInfo(_userControler.text, _passControler.text)) {
+      if (res.statusCode == 200) {
+        jsonResponse = json.decode(res.body);
+        if (jsonResponse != null) {
+          setState(() {
+            _isLoading = false;
+          });
+          final prefs = await SharedPreferences.getInstance();
+          prefs.setString('token', jsonResponse);
+          prefs.setString('user', UserName.toString());
+          await _infoUserByUserName.getInfoUserByUserName();
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => ScreenMain()));
+        } else {
+          Fluttertoast.showToast(
+              msg: "Tài khoản hoặc mật khẩu không đúng. Vui lòng nhập lại!",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Color.fromRGBO(70, 70, 70, 1.0),
+              textColor: Colors.white,
+              fontSize: 12.0);
+        }
       }
     }
   }
@@ -96,17 +102,27 @@ class _LoginPageState extends State<LoginPage> {
                           child: Column(
                             children: [
                               Container(
-                                child: TextField(
-                                  controller: _userControler,
-                                  decoration: ThemeHelper().textInputDecoration(
-                                      'User Name', 'Enter your user name'),
-                                ),
+                                child: StreamBuilder(
+                                    stream: bloc.userStream,
+                                    builder: (context, snapshot) => TextField(
+                                          controller: _userControler,
+                                          decoration:
+                                              ThemeHelper().textInputDecoration(
+                                            'User Name',
+                                            'Enter your user name',
+                                            snapshot.hasError
+                                                ? snapshot.error.toString()
+                                                : null,
+                                          ),
+                                        )),
                                 decoration:
                                     ThemeHelper().inputBoxDecorationShaddow(),
                               ),
                               SizedBox(height: 30.0),
                               Container(
-                                child: TextField(
+                                child: StreamBuilder(
+                                  stream: bloc.passStream,
+                                  builder: (context,snapshot) => TextField(
                                   obscureText: true,
                                   controller: _passControler,
                                   decoration: ThemeHelper().textInputDecoration(
@@ -114,8 +130,11 @@ class _LoginPageState extends State<LoginPage> {
                                     S
                                         .of(context)
                                         .authPageValidatorEmptyPassword,
+                                    snapshot.hasError
+                                                ? snapshot.error.toString()
+                                                : null,
                                   ),
-                                ),
+                                )),
                                 decoration:
                                     ThemeHelper().inputBoxDecorationShaddow(),
                               ),
@@ -164,7 +183,8 @@ class _LoginPageState extends State<LoginPage> {
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    signIn(_userControler.text, _passControler.text, 3);
+                                    signIn(_userControler.text,
+                                        _passControler.text, 3);
                                   },
                                 ),
                               ),
