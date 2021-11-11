@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:sea_demo01/src/repositories/validations.dart';
+
 class LoginBloc {
   StreamController _userController = new StreamController();
   StreamController _passController = new StreamController();
@@ -10,20 +11,22 @@ class LoginBloc {
 
   get context => null;
 
-  bool isValidInfo(String username,String password){
-    if(!Validations.isValidUser(username)){
+  bool isValidInfo(String username, String password) {
+    if (!Validations.isValidUser(username)) {
       _userController.sink.addError("Tài khoản không hợp lệ");
       return false;
     }
-    if(!Validations.isValidPass(password)){
+    _userController.sink.add("OK");
+
+    if (!Validations.isValidPass(password)) {
       _passController.sink.addError("Mật khẩu không hợp lệ");
       return false;
     }
-    _userController.sink.add("OK");
     _passController.sink.add("OK");
     return true;
   }
-  void dispose(){
+
+  void dispose() {
     _userController.close();
     _passController.close();
   }
